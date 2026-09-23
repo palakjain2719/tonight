@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPreferences, getSession, tryClaimStatus, updateSessionStatus, upsertPreferences } from "@/lib/db";
 import { broadcast } from "@/lib/supabase/server";
 import { generateFirstRoundPool } from "@/lib/pool";
+import { sanitizeMoodText } from "@/lib/sanitize";
 import type { PartnerRole, PreferenceInput } from "@/types";
 
 export const dynamic = "force-dynamic";
@@ -22,7 +23,12 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     return NextResponse.json({ error: "preferences is required" }, { status: 400 });
   }
 
-  await upsertPreferences(sessionId, partner, preferences);
+  const sanitized: PreferenceInput = {
+    ...preferences,
+    moodText: sanitizeMoodText(preferences.moodText ?? ""),
+  };
+
+  await upsertPreferences(sessionId, partner, sanitized);
   await broadcast(sessionId, "partner_joined", { partner });
 
   const both = await getPreferences(sessionId);
