@@ -46,7 +46,7 @@ export function SwipeDeck({
           type="button"
           aria-label="Pass"
           onClick={() => topRef.current?.fly("left")}
-          className="flex h-16 w-16 items-center justify-center rounded-full border border-white/15 bg-base-800 text-2xl text-white/70 shadow-lg transition-transform active:scale-90"
+          className="flex h-16 w-16 items-center justify-center rounded-full border border-base-700 bg-white text-2xl text-muted shadow-card transition-transform hover:border-ember-500/40 hover:text-ember-500 active:scale-90"
         >
           ✕
         </button>
@@ -54,7 +54,7 @@ export function SwipeDeck({
           type="button"
           aria-label="Like"
           onClick={() => topRef.current?.fly("right")}
-          className="flex h-16 w-16 items-center justify-center rounded-full bg-mint-500 text-2xl text-base-950 shadow-glow transition-transform active:scale-90"
+          className="flex h-16 w-16 items-center justify-center rounded-full bg-mint-500 text-2xl text-white shadow-glow transition-transform active:scale-90"
         >
           ♥
         </button>

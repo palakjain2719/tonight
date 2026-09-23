@@ -36,7 +36,9 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
       type="button"
       onClick={onClick}
       className={`rounded-full border px-4 py-2 text-sm font-medium transition-all active:scale-95 ${
-        active ? "border-ember-500 bg-ember-500/15 text-ember-400" : "border-white/10 bg-base-800 text-white/70 hover:border-white/20"
+        active
+          ? "border-ember-500 bg-ember-500/10 text-ember-500 font-semibold"
+          : "border-base-700 bg-white text-muted hover:border-ember-500/40 hover:text-ink shadow-card"
       }`}
     >
       {children}
@@ -47,8 +49,8 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
 function Section({ title, hint, children }: { title: string; hint?: string; children: React.ReactNode }) {
   return (
     <section>
-      <h2 className="font-display text-lg font-semibold">{title}</h2>
-      {hint && <p className="mt-0.5 text-sm text-white/45">{hint}</p>}
+      <h2 className="font-display text-lg font-semibold text-ink">{title}</h2>
+      {hint && <p className="mt-0.5 text-sm text-muted">{hint}</p>}
       <div className="mt-3">{children}</div>
     </section>
   );
@@ -121,7 +123,7 @@ export function PreferenceForm({
           placeholder='e.g. "something slow-burn with a twist, not too dark"'
           rows={3}
           maxLength={400}
-          className="w-full resize-none rounded-2xl border border-white/10 bg-base-800 px-4 py-3 text-sm placeholder:text-white/30 focus:border-ember-500 focus:outline-none"
+          className="w-full resize-none rounded-2xl border border-base-700 bg-white px-4 py-3 text-sm text-ink placeholder:text-faint focus:border-ember-500 focus:outline-none shadow-card"
         />
       </Section>
 
@@ -153,7 +155,7 @@ export function PreferenceForm({
               <Chip active={minRating === r} onClick={() => setMinRating(r)}>
                 {r}+
               </Chip>
-              {r === 9 && <span className="text-xs text-white/35">very few titles</span>}
+              {r === 9 && <span className="text-xs text-faint">very few titles</span>}
             </div>
           ))}
         </div>

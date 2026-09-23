@@ -4,7 +4,8 @@
 
 html,
 body {
-  background: #0a0a0f;
+  background: #f6f0e8;
+  color: #1c1510;
 }
 
 @layer utilities {
@@ -17,7 +18,7 @@ body {
   }
 
   .card-shimmer {
-    background: linear-gradient(90deg, #1b1b26 25%, #26262f 37%, #1b1b26 63%);
+    background: linear-gradient(90deg, #ede7dd 25%, #d2c9bb 37%, #ede7dd 63%);
     background-size: 400% 100%;
   }
 }
@@ -25,4 +26,27 @@ body {
 /* Prevent iOS Safari rubber-band scroll from fighting the swipe gesture. */
 .swipe-surface {
   touch-action: none;
+}
+
+/* Confetti particles for match animation */
+.confetti-piece {
+  position: absolute;
+  top: 0;
+  left: calc(var(--x, 50) * 1%);
+  width: var(--w, 10px);
+  height: var(--h, 14px);
+  border-radius: var(--r, 2px);
+  opacity: 0;
+  animation: confetti-fall var(--dur, 2s) ease-in var(--delay, 0s) forwards;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-20px) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) translateX(var(--drift, 0px)) rotate(var(--rot, 360deg));
+    opacity: 0;
+  }
 }

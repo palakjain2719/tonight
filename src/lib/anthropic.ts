@@ -1,17 +1,17 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import type { PreferenceInput, Title } from "@/types";
 import { MOVIE_GENRES, TV_GENRES } from "@/lib/tmdb";
 import { moodLabel, languageLabel, eraLabel } from "@/lib/preferences";
 
-let cached: Anthropic | null = null;
+let cached: GoogleGenerativeAI | null = null;
 
-function client(): Anthropic {
+function client(): GoogleGenerativeAI {
   if (cached) return cached;
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error("ANTHROPIC_API_KEY is not set in .env.local.");
+    throw new Error("GEMINI_API_KEY is not set in .env.local.");
   }
-  cached = new Anthropic({ apiKey });
+  cached = new GoogleGenerativeAI(apiKey);
   return cached;
 }
 
@@ -35,32 +35,62 @@ export interface HardConstraints {
 }
 
 export interface CoupleHistorySummary {
-  lovedTitles: string[]; // liked in a match/final-round AND rated 4-5
-  mehTitles: string[]; // liked/matched but rated 1-2, or a repeated no-match pattern
+  lovedTitles: string[];
+  mehTitles: string[];
 }
 
-const BRIEF_TOOL = {
+const BRIEF_FUNCTION = {
   name: "submit_search_brief",
   description: "Submit the refined TMDB search brief for tonight's watch.",
-  input_schema: {
-    type: "object" as const,
+  parameters: {
+    type: SchemaType.OBJECT,
     properties: {
-      movieGenres: { type: "array", items: { type: "number" }, description: "TMDB movie genre ids to include" },
-      tvGenres: { type: "array", items: { type: "number" }, description: "TMDB tv genre ids to include" },
-      excludeGenres: { type: "array", items: { type: "number" }, description: "TMDB genre ids (movie or tv) to actively avoid" },
-      keywords: {
-        type: "array",
-        items: { type: "string" },
-        description: "Short plain-English keyword phrases capturing mood nuance from the free text (e.g. 'heist', 'slow burn', 'coming of age'), used as TMDB keyword search terms",
+      movieGenres: {
+        type: SchemaType.ARRAY,
+        items: { type: SchemaType.NUMBER },
+        description: "TMDB movie genre ids to include",
       },
-      yearFrom: { type: "number" },
-      yearTo: { type: "number" },
-      minVoteAverage: { type: "number", description: "0-10 scale" },
-      sortBy: { type: "string", enum: ["popularity.desc", "vote_average.desc", "release_date.desc"] },
-      rationale: { type: "string", description: "One or two sentences on how you reconciled both partners' moods" },
+      tvGenres: {
+        type: SchemaType.ARRAY,
+        items: { type: SchemaType.NUMBER },
+        description: "TMDB tv genre ids to include",
+      },
+      excludeGenres: {
+        type: SchemaType.ARRAY,
+        items: { type: SchemaType.NUMBER },
+        description: "TMDB genre ids (movie or tv) to actively avoid",
+      },
+      keywords: {
+        type: SchemaType.ARRAY,
+        items: { type: SchemaType.STRING },
+        description: "Short plain-English keyword phrases capturing mood nuance",
+      },
+      yearFrom: { type: SchemaType.NUMBER },
+      yearTo: { type: SchemaType.NUMBER },
+      minVoteAverage: {
+        type: SchemaType.NUMBER,
+        description: "0-10 scale",
+      },
+      sortBy: {
+        type: SchemaType.STRING,
+        description: "One of: popularity.desc, vote_average.desc, release_date.desc",
+      },
+      rationale: {
+        type: SchemaType.STRING,
+        description: "One or two sentences on how you reconciled both partners' moods",
+      },
     },
-    required: ["movieGenres", "tvGenres", "excludeGenres", "keywords", "yearFrom", "yearTo", "minVoteAverage", "sortBy", "rationale"],
-    additionalProperties: false,
+    required: [
+      "movieGenres",
+      "tvGenres",
+      "excludeGenres",
+      "keywords",
+      "yearFrom",
+      "yearTo",
+      "minVoteAverage",
+      "sortBy",
+      "rationale",
+    ],
   },
 };
 
@@ -95,22 +125,23 @@ function clamp(brief: SearchBrief, hard: HardConstraints): SearchBrief {
   };
 }
 
-async function askClaude(prompt: string, hard: HardConstraints): Promise<SearchBrief> {
-  const model = process.env.ANTHROPIC_MODEL || "claude-sonnet-5";
-  const message = await client().messages.create({
-    model,
-    max_tokens: 1024,
-    tools: [BRIEF_TOOL],
-    tool_choice: { type: "tool", name: "submit_search_brief" },
-    messages: [{ role: "user", content: prompt }],
+async function askGemini(prompt: string, hard: HardConstraints): Promise<SearchBrief> {
+  const model = client().getGenerativeModel({
+    model: "gemini-2.0-flash",
+    tools: [{ functionDeclarations: [BRIEF_FUNCTION] }],
+    toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames: ["submit_search_brief"] } },
   });
 
-  const toolUse = message.content.find((block) => block.type === "tool_use");
-  if (!toolUse || toolUse.type !== "tool_use") {
-    throw new Error("Claude did not return a search brief.");
+  const result = await model.generateContent(prompt);
+  const response = result.response;
+  const parts = response.candidates?.[0]?.content?.parts ?? [];
+
+  const functionCall = parts.find((p) => p.functionCall);
+  if (!functionCall?.functionCall) {
+    throw new Error("Gemini did not return a search brief.");
   }
 
-  const raw = toolUse.input as SearchBrief;
+  const raw = functionCall.functionCall.args as unknown as SearchBrief;
   return clamp(raw, hard);
 }
 
@@ -147,7 +178,7 @@ Hard constraints you must stay within (already reconciled from both partners - d
 
 Call submit_search_brief with your reconciled brief.`;
 
-  return askClaude(prompt, hardConstraints);
+  return askGemini(prompt, hardConstraints);
 }
 
 export async function refineSearchBrief(params: {
@@ -188,5 +219,5 @@ Hard constraints (already reconciled - do not widen them): content must be ${har
 
 Call submit_search_brief with your sharpened brief.`;
 
-  return askClaude(prompt, hardConstraints);
+  return askGemini(prompt, hardConstraints);
 }

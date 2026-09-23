@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { SwipeDeck } from "@/components/SwipeDeck";
+import { BackButton } from "@/components/BackButton";
 import { Loader } from "@/components/Loader";
 import { getRole, pathForStatus } from "@/lib/clientSession";
 import { useSessionStatus } from "@/lib/useSessionStatus";
@@ -71,8 +72,7 @@ export default function SwipePage() {
         router.push(`/session/${id}/match`);
       }
     } catch {
-      // Swipe is best-effort — if it fails to save we just move on; the
-      // partner will simply not see a match on this title.
+      // Swipe is best-effort
     }
   }
 
@@ -86,14 +86,17 @@ export default function SwipePage() {
 
   return (
     <main className="flex flex-1 flex-col px-6 pb-28 pt-6">
+      <div className="mx-auto mb-4 w-full max-w-sm">
+        <BackButton />
+      </div>
       <div className="mx-auto mb-6 w-full max-w-sm">
-        <div className="flex items-center justify-between text-xs text-white/45">
+        <div className="flex items-center justify-between text-xs text-muted">
           <span>Round {loadedRound}</span>
           <span>
             {Math.min(swiped, titles.length)} / {titles.length}
           </span>
         </div>
-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
+        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-base-700">
           <div
             className="h-full rounded-full bg-ember-500 transition-all"
             style={{ width: `${titles.length ? (Math.min(swiped, titles.length) / titles.length) * 100 : 0}%` }}
@@ -104,7 +107,7 @@ export default function SwipePage() {
       {waitingForPartner ? (
         <div className="flex flex-1 items-center justify-center">
           <div className="text-center">
-            <p className="font-display text-xl font-semibold">Nicely done.</p>
+            <p className="font-display text-xl font-semibold text-ink">Nicely done.</p>
             <Loader label="Waiting for your partner to finish swiping..." />
           </div>
         </div>

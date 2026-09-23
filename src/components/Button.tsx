@@ -8,9 +8,9 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANTS: Record<string, string> = {
-  primary: "bg-ember-500 text-base-950 hover:bg-ember-400 shadow-glow disabled:bg-base-700 disabled:text-white/40 disabled:shadow-none",
-  secondary: "bg-base-800 text-white border border-white/10 hover:bg-base-700",
-  ghost: "bg-transparent text-white/70 hover:text-white hover:bg-white/5",
+  primary: "bg-ember-500 text-white hover:bg-ember-600 shadow-glow disabled:bg-base-700 disabled:text-muted disabled:shadow-none",
+  secondary: "bg-white text-ink border border-base-700 hover:border-ember-500/60 hover:bg-base-950 shadow-card",
+  ghost: "bg-transparent text-muted hover:text-ink hover:bg-base-900",
 };
 
 export const Button = forwardRef<HTMLButtonElement, Props>(function Button(

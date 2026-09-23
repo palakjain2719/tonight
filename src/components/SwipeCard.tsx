@@ -55,34 +55,34 @@ export const SwipeCard = forwardRef<SwipeCardHandle, Props>(function SwipeCard(
         else snapBack();
       }}
     >
-      <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-white/10 bg-base-800 shadow-2xl">
-        <div className="relative flex-1 bg-base-700">
+      <div className="relative flex h-full w-full flex-col overflow-hidden rounded-[28px] border border-base-700 bg-white shadow-lift">
+        <div className="relative flex-1 bg-base-900">
           {title.posterPath ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={title.posterPath} alt={title.title} className="h-full w-full object-cover" draggable={false} />
           ) : (
-            <div className="flex h-full w-full items-center justify-center text-white/20">
-              <span className="font-display text-lg">{title.title}</span>
+            <div className="flex h-full w-full items-center justify-center text-faint">
+              <span className="font-display text-lg italic">{title.title}</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-base-950 via-base-950/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[rgba(28,21,16,0.92)] via-[rgba(28,21,16,0.15)] to-transparent" />
         </div>
 
         <div className="absolute bottom-0 left-0 right-0 p-5">
           <div className="flex items-baseline gap-2">
-            <h3 className="font-display text-2xl font-semibold leading-tight">{title.title}</h3>
+            <h3 className="font-display text-2xl font-semibold leading-tight text-white">{title.title}</h3>
           </div>
-          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-white/70">
+          <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-white/75">
             {title.year && <span>{title.year}</span>}
             {title.imdbRating && (
-              <span className="flex items-center gap-1 rounded-md bg-white/10 px-1.5 py-0.5 text-xs font-semibold text-ember-400">
+              <span className="flex items-center gap-1 rounded-md bg-white/15 px-1.5 py-0.5 text-xs font-semibold text-amber-300">
                 ★ {title.imdbRating.toFixed(1)}
               </span>
             )}
             {runtimeLabel && <span>{runtimeLabel}</span>}
-            {title.mediaType === "tv" && <span className="rounded-md bg-white/10 px-1.5 py-0.5 text-xs">Series</span>}
+            {title.mediaType === "tv" && <span className="rounded-md bg-white/15 px-1.5 py-0.5 text-xs">Series</span>}
           </div>
-          {title.overview && <p className="mt-2 line-clamp-1 text-sm text-white/60">{title.overview}</p>}
+          {title.overview && <p className="mt-2 line-clamp-1 text-sm text-white/65">{title.overview}</p>}
         </div>
 
         {active && (
@@ -95,7 +95,7 @@ export const SwipeCard = forwardRef<SwipeCardHandle, Props>(function SwipeCard(
             </motion.div>
             <motion.div
               style={{ opacity: passOpacity }}
-              className="absolute left-6 top-6 -rotate-12 rounded-lg border-[3px] border-white/70 px-3 py-1 font-display text-xl font-bold text-white/70"
+              className="absolute left-6 top-6 -rotate-12 rounded-lg border-[3px] border-white/80 px-3 py-1 font-display text-xl font-bold text-white/80"
             >
               PASS
             </motion.div>

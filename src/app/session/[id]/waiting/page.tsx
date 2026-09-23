@@ -46,20 +46,20 @@ export default function WaitingPage() {
       <div className="w-full max-w-sm">
         {isGenerating ? (
           <>
-            <h1 className="font-display text-2xl font-semibold">Both of you are in.</h1>
-            <p className="mt-1 text-white/50">Claude is reconciling your moods and pulling tonight's picks.</p>
+            <h1 className="font-display text-2xl font-semibold text-ink">Both of you are in.</h1>
+            <p className="mt-1 text-muted">We're reconciling your moods and pulling tonight's picks.</p>
             <Loader label={rotatingMessage(elapsed)} />
           </>
         ) : role === "a" ? (
           <>
-            <h1 className="font-display text-2xl font-semibold">You're set.</h1>
-            <p className="mt-1 mb-8 text-white/50">Send this to whoever you're watching with tonight.</p>
+            <h1 className="font-display text-2xl font-semibold text-ink">You're set.</h1>
+            <p className="mt-1 mb-8 text-muted">Send this to whoever you're watching with tonight.</p>
             {joinLink && <QRShare link={joinLink} />}
-            <p className="mt-8 text-sm text-white/35">Waiting for them to join and set their mood...</p>
+            <p className="mt-8 text-sm text-faint">Waiting for them to join and set their mood...</p>
           </>
         ) : (
           <>
-            <h1 className="font-display text-2xl font-semibold">Got it.</h1>
+            <h1 className="font-display text-2xl font-semibold text-ink">Got it.</h1>
             <Loader label="Waiting on the rest of your session..." />
           </>
         )}

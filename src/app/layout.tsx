@@ -1,9 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Playfair_Display, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 
-const display = Space_Grotesk({ subsets: ["latin"], variable: "--font-display", weight: ["500", "600", "700"] });
-const body = Inter({ subsets: ["latin"], variable: "--font-body" });
+const displayFont = Playfair_Display({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+});
+
+const bodyFont = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["300", "400", "600"],
+});
 
 export const metadata: Metadata = {
   title: "Tonight — pick something you'll both actually watch",
@@ -14,13 +24,13 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#0a0a0f",
+  themeColor: "#f6f0e8",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={`${display.variable} ${body.variable} font-body bg-base-950 text-white antialiased`}>
+      <body className={`${displayFont.variable} ${bodyFont.variable} font-body bg-base-950 text-ink antialiased`}>
         <div className="min-h-dvh flex flex-col">{children}</div>
       </body>
     </html>

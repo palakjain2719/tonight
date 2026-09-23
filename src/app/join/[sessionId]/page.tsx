@@ -50,11 +50,11 @@ export default function JoinPage() {
     <main className="flex flex-1 flex-col items-center justify-center px-6 text-center">
       {error ? (
         <div className="max-w-sm">
-          <p className="font-display text-xl font-semibold">Hmm.</p>
-          <p className="mt-2 text-white/60">{error}</p>
+          <p className="font-display text-xl font-semibold text-ink">Hmm.</p>
+          <p className="mt-2 text-muted">{error}</p>
         </div>
       ) : (
-        <p className="text-white/50">Joining movie night...</p>
+        <p className="text-muted">Joining movie night...</p>
       )}
     </main>
   );

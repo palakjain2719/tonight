@@ -10,7 +10,7 @@ export function QRShare({ link }: { link: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    QRCode.toDataURL(link, { width: 480, margin: 2, color: { dark: "#0a0a0f", light: "#ffffff" } }).then((url) => {
+    QRCode.toDataURL(link, { width: 480, margin: 2, color: { dark: "#1c1510", light: "#f6f0e8" } }).then((url) => {
       if (!cancelled) setDataUrl(url);
     });
     return () => {
@@ -24,7 +24,7 @@ export function QRShare({ link }: { link: string }) {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      /* clipboard unavailable — the link is still visible on screen */
+      /* clipboard unavailable */
     }
   }
 
@@ -41,7 +41,7 @@ export function QRShare({ link }: { link: string }) {
         await nav.share({ title: "Movie night", text: "Join tonight's watch", url: link });
         return;
       } catch {
-        // User cancelled, or share failed — fall back to copy.
+        // fall back to copy
       }
     }
     await copyLink();
@@ -49,12 +49,12 @@ export function QRShare({ link }: { link: string }) {
 
   return (
     <div className="flex flex-col items-center gap-5">
-      <div className="rounded-3xl bg-white p-4 shadow-glow">
+      <div className="rounded-3xl bg-base-950 p-4 shadow-card border border-base-700">
         {dataUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={dataUrl} alt="QR code to join tonight's watch" className="h-56 w-56" />
         ) : (
-          <div className="h-56 w-56 animate-pulse rounded-2xl bg-base-800" />
+          <div className="h-56 w-56 animate-pulse rounded-2xl bg-base-900" />
         )}
       </div>
 
@@ -62,7 +62,7 @@ export function QRShare({ link }: { link: string }) {
         Share with your partner
       </Button>
 
-      <button type="button" onClick={copyLink} className="text-sm text-white/45 underline underline-offset-2 hover:text-white/70">
+      <button type="button" onClick={copyLink} className="text-sm text-muted underline underline-offset-2 hover:text-ink">
         {copied ? "Link copied!" : "Or copy the link instead"}
       </button>
     </div>
