@@ -127,7 +127,7 @@ function clamp(brief: SearchBrief, hard: HardConstraints): SearchBrief {
 
 async function askGemini(prompt: string, hard: HardConstraints): Promise<SearchBrief> {
   const model = client().getGenerativeModel({
-    model: "gemini-2.0-flash",
+    model: "gemini-2.5-flash",
     tools: [{ functionDeclarations: [BRIEF_FUNCTION] }] as never,
     toolConfig: { functionCallingConfig: { mode: FunctionCallingMode.ANY, allowedFunctionNames: ["submit_search_brief"] } },
   });
