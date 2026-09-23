@@ -1,17 +1,17 @@
-import { GoogleGenerativeAI, SchemaType, FunctionCallingMode } from "@google/generative-ai";
+import { GoogleGenAI, Type, FunctionCallingConfigMode } from "@google/genai";
 import type { PreferenceInput, Title } from "@/types";
 import { MOVIE_GENRES, TV_GENRES } from "@/lib/tmdb";
 import { moodLabel, languageLabel, eraLabel } from "@/lib/preferences";
 
-let cached: GoogleGenerativeAI | null = null;
+let cached: GoogleGenAI | null = null;
 
-function client(): GoogleGenerativeAI {
+function client(): GoogleGenAI {
   if (cached) return cached;
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY is not set in .env.local.");
   }
-  cached = new GoogleGenerativeAI(apiKey);
+  cached = new GoogleGenAI({ apiKey });
   return cached;
 }
 
@@ -43,40 +43,40 @@ const BRIEF_FUNCTION = {
   name: "submit_search_brief",
   description: "Submit the refined TMDB search brief for tonight's watch.",
   parameters: {
-    type: SchemaType.OBJECT,
+    type: Type.OBJECT,
     properties: {
       movieGenres: {
-        type: SchemaType.ARRAY,
-        items: { type: SchemaType.NUMBER },
+        type: Type.ARRAY,
+        items: { type: Type.NUMBER },
         description: "TMDB movie genre ids to include",
       },
       tvGenres: {
-        type: SchemaType.ARRAY,
-        items: { type: SchemaType.NUMBER },
+        type: Type.ARRAY,
+        items: { type: Type.NUMBER },
         description: "TMDB tv genre ids to include",
       },
       excludeGenres: {
-        type: SchemaType.ARRAY,
-        items: { type: SchemaType.NUMBER },
+        type: Type.ARRAY,
+        items: { type: Type.NUMBER },
         description: "TMDB genre ids (movie or tv) to actively avoid",
       },
       keywords: {
-        type: SchemaType.ARRAY,
-        items: { type: SchemaType.STRING },
+        type: Type.ARRAY,
+        items: { type: Type.STRING },
         description: "Short plain-English keyword phrases capturing mood nuance",
       },
-      yearFrom: { type: SchemaType.NUMBER },
-      yearTo: { type: SchemaType.NUMBER },
+      yearFrom: { type: Type.NUMBER },
+      yearTo: { type: Type.NUMBER },
       minVoteAverage: {
-        type: SchemaType.NUMBER,
+        type: Type.NUMBER,
         description: "0-10 scale",
       },
       sortBy: {
-        type: SchemaType.STRING,
+        type: Type.STRING,
         description: "One of: popularity.desc, vote_average.desc, release_date.desc",
       },
       rationale: {
-        type: SchemaType.STRING,
+        type: Type.STRING,
         description: "One or two sentences on how you reconciled both partners' moods",
       },
     },
@@ -126,22 +126,26 @@ function clamp(brief: SearchBrief, hard: HardConstraints): SearchBrief {
 }
 
 async function askGemini(prompt: string, hard: HardConstraints): Promise<SearchBrief> {
-  const model = client().getGenerativeModel({
-    model: "gemini-1.5-flash",
-    tools: [{ functionDeclarations: [BRIEF_FUNCTION] }] as never,
-    toolConfig: { functionCallingConfig: { mode: FunctionCallingMode.ANY, allowedFunctionNames: ["submit_search_brief"] } },
+  const response = await client().models.generateContent({
+    model: "gemini-2.0-flash",
+    contents: prompt,
+    config: {
+      tools: [{ functionDeclarations: [BRIEF_FUNCTION] }],
+      toolConfig: {
+        functionCallingConfig: {
+          mode: FunctionCallingConfigMode.ANY,
+          allowedFunctionNames: ["submit_search_brief"],
+        },
+      },
+    },
   });
 
-  const result = await model.generateContent(prompt);
-  const response = result.response;
-  const parts = response.candidates?.[0]?.content?.parts ?? [];
-
-  const functionCall = parts.find((p) => p.functionCall);
-  if (!functionCall?.functionCall) {
+  const calls = response.functionCalls;
+  if (!calls?.length) {
     throw new Error("Gemini did not return a search brief.");
   }
 
-  const raw = functionCall.functionCall.args as unknown as SearchBrief;
+  const raw = calls[0]!.args as unknown as SearchBrief;
   return clamp(raw, hard);
 }
 
