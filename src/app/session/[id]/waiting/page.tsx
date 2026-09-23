@@ -41,6 +41,8 @@ export default function WaitingPage() {
   if (!role) return null;
 
   const isGenerating = data?.status === "generating";
+  // If stuck generating for >90s, surface a retry rather than waiting forever
+  const generationStuck = isGenerating && elapsed > 90;
 
   return (
     <main className="flex flex-1 flex-col px-6 py-10">
@@ -49,11 +51,25 @@ export default function WaitingPage() {
       </div>
       <div className="flex flex-1 flex-col items-center justify-center text-center w-full max-w-sm mx-auto">
         {isGenerating ? (
-          <>
-            <h1 className="font-display text-2xl font-semibold text-ink">Both of you are in.</h1>
-            <p className="mt-1 text-muted">We&apos;re reconciling your moods and pulling tonight&apos;s picks.</p>
-            <Loader label={rotatingMessage(elapsed)} />
-          </>
+          generationStuck ? (
+            <>
+              <h1 className="font-display text-2xl font-semibold text-ink">Taking longer than expected.</h1>
+              <p className="mt-2 text-sm text-muted">Something may have gone wrong picking tonight&apos;s titles.</p>
+              <button
+                type="button"
+                onClick={() => router.replace("/")}
+                className="mt-8 rounded-full bg-ember-500 px-6 py-3 text-sm font-semibold text-white"
+              >
+                Start a new session
+              </button>
+            </>
+          ) : (
+            <>
+              <h1 className="font-display text-2xl font-semibold text-ink">Both of you are in.</h1>
+              <p className="mt-1 text-muted">We&apos;re reconciling your moods and pulling tonight&apos;s picks.</p>
+              <Loader label={rotatingMessage(elapsed)} />
+            </>
+          )
         ) : role === "a" ? (
           <>
             <h1 className="font-display text-2xl font-semibold text-ink">You&apos;re set.</h1>

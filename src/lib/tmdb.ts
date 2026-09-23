@@ -100,17 +100,12 @@ async function tmdbFetch(path: string, params: Record<string, string | number | 
  * Unmatched phrases are silently dropped rather than failing the whole pool.
  */
 export async function resolveKeywordIds(phrases: string[]): Promise<number[]> {
-  const ids: number[] = [];
-  for (const phrase of phrases) {
-    try {
-      const json = await tmdbFetch("/search/keyword", { query: phrase, page: 1 });
-      const match = (json.results || [])[0];
-      if (match?.id) ids.push(match.id);
-    } catch {
-      // Skip phrases TMDB's keyword search can't resolve.
-    }
-  }
-  return ids;
+  const settled = await Promise.allSettled(
+    phrases.map((phrase) => tmdbFetch("/search/keyword", { query: phrase, page: 1 }))
+  );
+  return settled
+    .map((r) => (r.status === "fulfilled" ? (r.value.results || [])[0]?.id : undefined))
+    .filter((id): id is number => typeof id === "number");
 }
 
 interface RawTmdbResult {
@@ -196,15 +191,12 @@ export async function buildTitlePool(query: PoolQuery): Promise<Title[]> {
   const pool: Title[] = [];
   const keywordIds = query.keywords.length ? await resolveKeywordIds(query.keywords) : [];
 
-  for (const mediaType of query.mediaTypes) {
+  // Fetch all discover pages in parallel across media types
+  const discoverRequests = query.mediaTypes.flatMap((mediaType) => {
     const genres = mediaType === "movie" ? query.movieGenres : query.tvGenres;
-    // Pull a couple of pages per media type, and fall back to a
-    // genre-agnostic sweep if the strict filters come up short.
-    for (const page of [1, 2, 3]) {
-      if (pool.length >= query.count) break;
-      const { results } = await discoverOne({
-        mediaType,
-        genres,
+    return [1, 2, 3].map((page) =>
+      discoverOne({
+        mediaType, genres,
         excludeGenres: query.excludeGenres,
         languageIsoCodes: query.languageIsoCodes,
         yearFrom: query.yearFrom,
@@ -213,36 +205,44 @@ export async function buildTitlePool(query: PoolQuery): Promise<Title[]> {
         keywordIds,
         sortBy: query.sortBy,
         page,
-      });
-      for (const r of results) {
-        const key = `${mediaType}:${r.id}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        pool.push(toTitle(r, mediaType));
-      }
+      })
+    );
+  });
+
+  const discoverResults = await Promise.allSettled(discoverRequests);
+  for (const settled of discoverResults) {
+    if (settled.status !== "fulfilled") continue;
+    for (const r of settled.value.results) {
+      const key = `${settled.value.mediaType}:${r.id}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      pool.push(toTitle(r, settled.value.mediaType));
     }
   }
 
   if (pool.length < query.count) {
-    for (const mediaType of query.mediaTypes) {
-      if (pool.length >= query.count) break;
-      const { results } = await discoverOne({
-        mediaType,
-        genres: [],
-        excludeGenres: query.excludeGenres,
-        languageIsoCodes: query.languageIsoCodes,
-        yearFrom: query.yearFrom,
-        yearTo: query.yearTo,
-        minVoteAverage: query.minVoteAverage,
-        keywordIds: [],
-        sortBy: "popularity.desc",
-        page: 1,
-      });
-      for (const r of results) {
-        const key = `${mediaType}:${r.id}`;
+    const fallbackResults = await Promise.allSettled(
+      query.mediaTypes.map((mediaType) =>
+        discoverOne({
+          mediaType, genres: [],
+          excludeGenres: query.excludeGenres,
+          languageIsoCodes: query.languageIsoCodes,
+          yearFrom: query.yearFrom,
+          yearTo: query.yearTo,
+          minVoteAverage: query.minVoteAverage,
+          keywordIds: [],
+          sortBy: "popularity.desc",
+          page: 1,
+        })
+      )
+    );
+    for (const settled of fallbackResults) {
+      if (settled.status !== "fulfilled") continue;
+      for (const r of settled.value.results) {
+        const key = `${settled.value.mediaType}:${r.id}`;
         if (seen.has(key)) continue;
         seen.add(key);
-        pool.push(toTitle(r, mediaType));
+        pool.push(toTitle(r, settled.value.mediaType));
       }
     }
   }
