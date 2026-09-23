@@ -217,7 +217,7 @@ export default function MatchPage() {
 
       <div className="px-6 py-10">
         <div className="mx-auto mb-4 w-full max-w-sm">
-          <BackButton />
+          <BackButton href="/" />
         </div>
         <div className="mx-auto w-full max-w-sm animate-pop-in text-center">
           <p className="mb-2 font-display text-sm font-semibold uppercase tracking-[0.2em] text-ember-500">It&apos;s a match</p>

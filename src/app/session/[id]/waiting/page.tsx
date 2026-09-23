@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { QRShare } from "@/components/QRShare";
+import { BackButton } from "@/components/BackButton";
 import { Loader, rotatingMessage } from "@/components/Loader";
 import { getRole, pathForStatus } from "@/lib/clientSession";
 import { useSessionStatus } from "@/lib/useSessionStatus";
@@ -42,8 +43,11 @@ export default function WaitingPage() {
   const isGenerating = data?.status === "generating";
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center px-6 py-10 text-center">
-      <div className="w-full max-w-sm">
+    <main className="flex flex-1 flex-col px-6 py-10">
+      <div className="mb-6">
+        <BackButton href="/" />
+      </div>
+      <div className="flex flex-1 flex-col items-center justify-center text-center w-full max-w-sm mx-auto">
         {isGenerating ? (
           <>
             <h1 className="font-display text-2xl font-semibold text-ink">Both of you are in.</h1>
