@@ -54,7 +54,7 @@ export default function PreferencesPage() {
         </p>
         <h1 className="font-display text-2xl font-semibold text-ink">Set your mood for tonight</h1>
         <p className="mt-1 text-sm text-muted">
-          Answer for yourself — your partner won't see this until you're both done.
+          Answer for yourself — your partner won&apos;t see this until you&apos;re both done.
         </p>
 
         <div className="mt-8">

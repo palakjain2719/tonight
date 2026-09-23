@@ -29,7 +29,7 @@ function Confetti() {
     () =>
       Array.from({ length: 70 }, (_, i) => ({
         id: i,
-        color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+        color: CONFETTI_COLORS[i % CONFETTI_COLORS.length]!,
         left: Math.random() * 100,
         delay: Math.random() * 1.6,
         duration: 2.2 + Math.random() * 1.6,
@@ -89,7 +89,7 @@ export default function MatchPage() {
           setPlatforms(json.platforms || []);
         }
       } catch {
-        if (!cancelled) setError("Couldn't load your match — try refreshing.");
+        if (!cancelled) setError("Couldn’t load your match — try refreshing.");
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -151,7 +151,7 @@ export default function MatchPage() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.15, duration: 0.5 }}
               >
-                Tonight's pick
+                Tonight&apos;s pick
               </motion.p>
 
               <motion.h1
@@ -220,7 +220,7 @@ export default function MatchPage() {
           <BackButton />
         </div>
         <div className="mx-auto w-full max-w-sm animate-pop-in text-center">
-          <p className="mb-2 font-display text-sm font-semibold uppercase tracking-[0.2em] text-ember-500">It's a match</p>
+          <p className="mb-2 font-display text-sm font-semibold uppercase tracking-[0.2em] text-ember-500">It&apos;s a match</p>
 
           <div className="mx-auto mb-6 aspect-[2/3] w-48 overflow-hidden rounded-2xl shadow-lift border border-base-700">
             {title.posterPath ? (

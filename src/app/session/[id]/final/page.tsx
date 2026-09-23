@@ -93,7 +93,7 @@ export default function FinalPage() {
       <div className="mx-auto w-full max-w-sm">
         <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ember-500">No match yet</p>
         <h1 className="font-display text-2xl font-semibold text-ink">You two are close. Pick together.</h1>
-        <p className="mt-1 text-sm text-muted">Here's what got the most love across both rounds — decide as a team.</p>
+        <p className="mt-1 text-sm text-muted">Here&apos;s what got the most love across both rounds — decide as a team.</p>
 
         <div className="mt-6 flex flex-col gap-3">
           {ranked === null ? (

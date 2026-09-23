@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType, FunctionCallingMode } from "@google/generative-ai";
 import type { PreferenceInput, Title } from "@/types";
 import { MOVIE_GENRES, TV_GENRES } from "@/lib/tmdb";
 import { moodLabel, languageLabel, eraLabel } from "@/lib/preferences";
@@ -128,8 +128,8 @@ function clamp(brief: SearchBrief, hard: HardConstraints): SearchBrief {
 async function askGemini(prompt: string, hard: HardConstraints): Promise<SearchBrief> {
   const model = client().getGenerativeModel({
     model: "gemini-2.0-flash",
-    tools: [{ functionDeclarations: [BRIEF_FUNCTION] }],
-    toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames: ["submit_search_brief"] } },
+    tools: [{ functionDeclarations: [BRIEF_FUNCTION] }] as never,
+    toolConfig: { functionCallingConfig: { mode: FunctionCallingMode.ANY, allowedFunctionNames: ["submit_search_brief"] } },
   });
 
   const result = await model.generateContent(prompt);

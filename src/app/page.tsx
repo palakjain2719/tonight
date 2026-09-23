@@ -47,7 +47,7 @@ export default function LandingPage() {
         </h1>
         <p className="mt-4 text-muted leading-relaxed">
           You set your mood, they set theirs — separately. We find what actually overlaps, and pull it up on whatever
-          you're already paying for.
+          you&apos;re already paying for.
         </p>
 
         <div className="mt-10">
@@ -59,7 +59,7 @@ export default function LandingPage() {
         {error && <p className="mt-4 text-sm text-ember-500">{error}</p>}
 
         <p className="mt-6 text-xs text-faint">
-          You'll set your preferences first, then send a QR code to whoever you're watching with tonight.
+          You&apos;ll set your preferences first, then send a QR code to whoever you&apos;re watching with tonight.
         </p>
       </div>
     </main>

@@ -70,7 +70,7 @@ function tmdbHeaders() {
   if (key.startsWith("eyJ")) {
     return { Authorization: `Bearer ${key}` };
   }
-  return {};
+  return {} as Record<string, string>;
 }
 
 function tmdbQueryKey() {
@@ -258,6 +258,7 @@ async function attachRuntimes(titles: Title[], concurrency = 8): Promise<void> {
     while (cursor < titles.length) {
       const i = cursor++;
       const t = titles[i];
+      if (!t) continue;
       t.runtime = await fetchRuntime(t.tmdbId, t.mediaType);
     }
   }

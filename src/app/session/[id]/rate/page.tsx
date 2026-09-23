@@ -49,7 +49,7 @@ export default function RatePage() {
     return (
       <main className="flex flex-1 flex-col items-center justify-center px-6 text-center">
         <p className="font-display text-2xl font-semibold text-ink">Saved.</p>
-        <p className="mt-2 text-muted">We'll use this to pick better next time.</p>
+        <p className="mt-2 text-muted">We&apos;ll use this to pick better next time.</p>
       </main>
     );
   }

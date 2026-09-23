@@ -20,5 +20,5 @@ export function Loader({ label }: { label?: string }) {
 
 export function rotatingMessage(seconds: number): string {
   const idx = Math.min(MESSAGES.length - 1, Math.floor(seconds / 3));
-  return MESSAGES[idx];
+  return MESSAGES[idx] ?? MESSAGES[0]!;
 }

@@ -1,6 +1,6 @@
 # Tonight — a movie/TV matchmaker for two
 
-Two independent preference forms → Claude reconciles them into a search
+Two independent preference forms → Gemini reconciles them into a search
 brief → TMDB supplies 30 candidate titles → both partners swipe → a match
 (or a top-5 fallback after two rounds) shows exactly where to watch it in
 India right now.
@@ -9,7 +9,7 @@ India right now.
 
 - **Next.js 14** (App Router, TypeScript, Tailwind) — one codebase for the UI and the API routes that call Claude/TMDB/RapidAPI server-side, so no key ever reaches the browser.
 - **Supabase** (Postgres + Realtime) — session/preference/swipe/match/rating storage. All table access goes through server-side routes using the service-role key; the browser only subscribes to a Realtime *broadcast* channel per session (`session:{id}`) to know instantly when a partner joins, the pool is ready, a match lands, or a round advances. A 3s poll runs alongside it as a fallback if a broadcast is missed.
-- **Anthropic (Claude)** — reconciles both partners' structured picks *and* free-text mood descriptions into one TMDB search brief (genres, keywords, year range, rating floor), both for round 1 and the sharper round 2. It's called via forced tool-use so the response is always well-formed JSON.
+- **Google Gemini** — reconciles both partners' structured picks *and* free-text mood descriptions into one TMDB search brief (genres, keywords, year range, rating floor), both for round 1 and the sharper round 2. It's called via forced function-calling so the response is always well-formed JSON.
 - **TMDB** — the actual title data (posters, overview, genres, year, TMDB rating). Free-text keyword phrases from Claude's brief are resolved to TMDB keyword ids before being used in `/discover`, since that filter only accepts ids.
 - **RapidAPI "Streaming Availability"** (movie-of-the-night) — live India (`country=in`) streaming links per title, with direct deep links per platform.
 
@@ -28,9 +28,9 @@ npm run dev
 
 | Env var | Where to get it |
 |---|---|
-| `ANTHROPIC_API_KEY` | console.anthropic.com |
-| `TMDB_API_KEY` | themoviedb.org/settings/api — either the v3 key or the v4 read-access token both work |
-| `RAPIDAPI_KEY` / `RAPIDAPI_HOST` | rapidapi.com → subscribe to "Streaming Availability" by movie-of-the-night |
+| `GEMINI_API_KEY` | aistudio.google.com/app/apikey |
+| `TMDB_API_KEY` / `TMDB_READ_ACCESS_TOKEN` | themoviedb.org/settings/api — either the v3 key or the v4 read-access token both work |
+| `RAPIDAPI_KEY` / `RAPIDAPI_HOST` | rapidapi.com → subscribe to "OTT Details" by gox-ai |
 | `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | your Supabase project's API settings |
 
 ### Database
